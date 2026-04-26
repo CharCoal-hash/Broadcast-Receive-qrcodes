@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Broadcaster</title>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; text-align: center; }
+        #qr-frame { background: white; padding: 20px; display: inline-block; margin-top: 50px; border-radius: 10px; }
+        img { width: 500px; height: 500px; image-rendering: crisp-edges; }
+        #info { margin-top: 20px; font-size: 1.5em; }
+    </style>
+</head>
+<body>
+    <div id="qr-frame">
+        <img id="display" src="qr_grid_svg/chunk_0000.svg">
+    </div>
+    <div id="info">Chunk: <span id="idx">0000</span> / 1476</div>
+
+    <script>
+        let current = 0;
+        const total = 1476; // Adjust to 1477 if your last file is 1477
+        const img = document.getElementById('display');
+        const txt = document.getElementById('idx');
+
+        setInterval(() => {
+            current = (current > total) ? 0 : current + 1;
+            // Pad index to 4 digits (0000, 0001, etc.)
+            let padded = current.toString().padStart(4, '0');
+            img.src = `qr_grid_svg/chunk_${padded}.svg`;
+            txt.innerText = padded;
+        }, 500); // 0.5 seconds per QR
+    </script>
+</body>
+</html>

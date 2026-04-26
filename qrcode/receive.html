@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Receiver</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; }
+        #reader { width: 100%; max-width: 500px; margin: auto; }
+        progress { width: 100%; height: 30px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Mom's Birthday Decryptor</h1>
+    <div id="reader"></div>
+    <div id="status">Ready to scan...</div>
+    <progress id="pbar" value="0" max="1477"></progress>
+
+    <script>
+        let receivedData = {};
+        let totalChunks = 1477;
+
+        function onScanSuccess(decodedText) {
+            const [index, total, payload] = decodedText.split('|');
+            const idx = parseInt(index);
+            
+            if (!receivedData[idx]) {
+                receivedData[idx] = payload;
+                const count = Object.keys(receivedData).length;
+                document.getElementById('pbar').value = count;
+                document.getElementById('status').innerText = `Got chunk ${idx}! (${count}/${totalChunks})`;
+
+                if (count === totalChunks) {
+                    finalize();
+                }
+            }
+        }
+
+        function finalize() {
+            let fullBase64 = "";
+            for (let i = 0; i < totalChunks; i++) {
+                fullBase64 += receivedData[i];
+            }
+            
+            const link = document.createElement('a');
+            link.href = "data:application/zip;base64," + fullBase64;
+            link.download = "birthday_gift.zip";
+            document.body.appendChild(link);
+            link.click();
+            alert("All data received! Zip file downloaded.");
+        }
+
+        const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        scanner.render(onScanSuccess);
+    </script>
+</body>
+</html>
